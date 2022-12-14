@@ -1,0 +1,31 @@
+statefulNode:
+  extraArgs:
+    - --chain=bor-mainnet
+    - --bor.heimdall=https://heimdall-polygon-mainnet-0-heimdall:1317
+    - --torrent.download.rate=100mb # Download snapshot files faster
+    - --torrent.download.slots=6 # 3 is default
+    # - --txpool.disable # experimental external pool and block producer, see ./cmd/txpool/readme.md for more info. Disabling internal txpool and block producer.
+    - --db.read.concurrency=16 # Does limit amount of parallel db reads. Default: equal to GOMAXPROCS (or number of CPU) (default: 10)
+    - --db.pagesize=8KB # set mdbx pagesize on db creation: must be power of 2 and '256b <= pagesize <= 64kb'. default: equal to OperationSystem's pageSize (default: "4KB") TODO add notes on relation to zfs recordsize
+    - --rpc.batch.concurrency=16 # default 2
+    - --http.corsdomain=*
+    - --ws # enable ws
+    - --http.api=eth,debug,net,trace
+    - --trace.maxtraces=10000
+    - --externalcl
+
+  restoreSnapshot:
+    enable: true
+    snapshotUrl: https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/erigon-archive-snapshot-2022-12-13.tar.gz
+
+
+rpcdaemon:
+  enabled: true
+  replicaCount: 1 # scale me
+  extraArgs:
+    - --http.api=eth,debug,net,trace
+    - --trace.maxtraces=10000
+    - --http.corsdomain=*
+    - --ws # enable ws
+    - --rpc.batch.concurrency=16 # default 2
+    - --state.cache=32000000 # default 1000000, only makes sense for rpcdaemon without --datadir, Amount of keys to store in StateCache (enabled if no --datadir set). Set 0 to disable StateCache. 1_000_000 keys ~ equal to 2Gb RAM (maybe we will add RAM accounting in future versions). (default: 1000000)
